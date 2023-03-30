@@ -1,0 +1,37 @@
+def pbLadder
+
+  # Identify name and number of ladder event the player is touching
+  interp = pbMapInterpreter
+  this_event = interp.get_self
+  name = this_event.name.to_s
+  no = name[/\d+/].to_s
+  if name.include?("do") # Determine corresponding ladder (up/down)
+    corr = "up"
+  else
+    corr = "do"
+  end
+ 
+  # Search for the corresponding ladder on map
+  x = nil
+  y = nil
+  $game_map.events.values.each do |event|
+    if event.name.include?("Ladder") && event.name.include?(no) && event.name.include?(corr)
+      x = event.x
+      y = event.y
+    end
+  end
+ 
+  if x && y
+    pbSEPlay("Door exit",100)
+    pbFadeOutIn {
+      $game_temp.player_new_map_id    = $game_map.map_id # Stay on the same map
+      $game_temp.player_new_x         = x
+      $game_temp.player_new_y         = y + 1
+      $game_temp.player_new_direction = 2
+      $scene.transfer_player
+      $game_map.autoplay
+      $game_map.refresh
+    }
+  end
+   
+end
